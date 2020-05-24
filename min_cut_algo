@@ -1,0 +1,8 @@
+Min Cut Problem
+In a flow network an s-t cut is a cut that requires the source and sink to be in diff subsets and it consists all edges from source side to the sink side .
+Capacity of an s-t cut is defined as the sum of capacities of each edge in the cut.
+Algorithm
+1- Run the ford algorithm and calculate the final residual graph.
+2- find the set of vertices that are reachable from source.
+3- All the edges that are non-reachable vertices from a reachable vertex are min cut edges.
+
