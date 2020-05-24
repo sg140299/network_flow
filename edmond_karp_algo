@@ -1,0 +1,101 @@
+#include<bits/stdc++.h>
+using namespace std;
+bool bfs(int **residualcapacity ,int source,int sink,int n,int *parent){
+    bool visited[n];
+    memset(visited,false,sizeof(visited));
+    bool found_augmented_path=false;
+    queue<int> q;
+    q.push(source);
+    visited[source]=true;
+    while(!q.empty()){
+        int u=q.front();
+        q.pop();
+        for(int i=0;i<n;i++){
+            if(!visited[i] && residualcapacity[u][i]>0){
+                q.push(i);
+                parent[i]=u;
+                visited[i]=true;
+                if(i==sink){
+                    found_augmented_path=true;
+                    break;
+                }
+            }
+        }
+    }
+    //cout<<endl;
+    return found_augmented_path;
+}
+void print_augmented_paths(vector<vector<int> > augmented_paths){
+    for(int i=0;i<augmented_paths.size();i++){
+        for(int j=0;j<augmented_paths[i].size();j++){
+            cout<<augmented_paths[i][j]<<", ";
+        }
+        cout<<endl;
+    }
+    return;
+}
+int maxflow(int **capacity,int source,int sink,int n){
+    int **residualcapacity=new int *[n];
+    for(int i=0;i<n;i++){
+        residualcapacity[i]=new int[n]{0};
+    }
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            residualcapacity[i][j]=capacity[i][j];
+        }
+    }
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cout<<residualcapacity[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    int *parent=new int[1000];
+    vector<vector<int> >augmented_paths;
+    int max_flow=0;
+    while(bfs(residualcapacity,source,sink,n,parent)){
+        vector<int> curr_augmented_path;
+        int flow=INT_MAX;
+        int u=sink;
+        //curr_augmented_path.push_back(sink);
+        while(u!=source){
+            curr_augmented_path.push_back(u);
+            int v=parent[u];
+            if(flow > residualcapacity[u][v]) flow=residualcapacity[u][v];
+
+            u=v;
+        }
+        curr_augmented_path.push_back(source);
+        reverse(curr_augmented_path.begin(),curr_augmented_path.end());
+        augmented_paths.push_back(curr_augmented_path);
+        max_flow+=flow;
+        int v=sink;
+        while(v!=source){
+            int u=parent[v];
+            residualcapacity[u][v] -=flow;
+            residualcapacity[v][u] +=flow;
+            v=u;
+        }
+
+    }
+    print_augmented_paths(augmented_paths);
+    return max_flow;
+}
+int main(){
+    int n,e;
+    cin>>n>>e;
+    int **capacity=new int *[n];
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            capacity[i][j]=0;
+        }
+    }
+    for(int i=0;i<e;i++){
+        int u,v,c;
+        cin>>u>>v>>c;
+        capacity[u][v]=c;
+    }
+    cout<<maxflow(capacity,0,1,n)<<endl;
+
+    return 0;
+}
